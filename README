@@ -1,0 +1,39 @@
+USAGE
+
+/usr/lib/java/jdk1.8.0_101/bin/java -cp lib/GenomeAnalysisTK.jar:AddVcfDosage.jar <infile.vcf.gz> <outfile.vcf.gz>
+
+
+EXAMPLE
+
+Output file:
+
+
+cat test.out.vcf | cut -f 1-11  | head -n 10
+##fileformat=VCFv4.2
+##FORMAT=<ID=DS,Number=1,Type=Float,Description="Genotype dosage">
+##FORMAT=<ID=GP,Number=3,Type=Float,Description="Genotype call probabilities">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype calls">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	01_A01	01_A02
+22	16847963	rs76774496:16847963:A:G	A	G	.	.	.	GT:DS:GP	1/1:2:0,0,1	0/1:1:0,1,0
+22	16848015	rs112143081:16848015:C:G	C	G	.	.	.	GT:DS:GP	1/1:2:0,0,1	0/1:1:0,1,0
+22	16848470	rs12158520:16848470:A:G	A	G	.	.	.	GT:DS:GP	1/1:2:0,0,1	0/1:1:0,1,0
+22	16848520	rs62221844:16848520:A:T	A	T	.	.	.	GT:DS:GP	1/1:2:0,0,1	0/1:1:0,1,0
+22	16849105	rs5992767:16849105:A:G	A	G	.	.	.	GT:DS:GP	1/1:2:0,0,1	0/1:1:0,1,0
+
+
+
+
+Input file:
+
+cat test.vcf | cut -f 1-11  | head -n 10
+##fileformat=VCFv4.1
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype calls">
+##FORMAT=<ID=GP,Number=3,Type=Float,Description="Genotype call probabilities">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	01_A01	01_A02
+22	16847963	rs76774496:16847963:A:G	A	G	.	.	.	GT:GP	1/1:0,0,1	0/1:0,1,0
+22	16848015	rs112143081:16848015:C:G	C	G	.	.	.	GT:GP	1/1:0,0,1	0/1:0,1,0
+22	16848470	rs12158520:16848470:A:G	A	G	.	.	.	GT:GP	1/1:0,0,1	0/1:0,1,0
+22	16848520	rs62221844:16848520:A:T	A	T	.	.	.	GT:GP	1/1:0,0,1	0/1:0,1,0
+22	16849105	rs5992767:16849105:A:G	A	G	.	.	.	GT:GP	1/1:0,0,1	0/1:0,1,0
+22	16849573	rs145111476:16849573:A:G	A	G	.	.	.	GT:GP	1/1:0,0,1	0/1:0,1,0
+        

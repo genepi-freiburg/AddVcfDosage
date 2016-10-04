@@ -37,7 +37,7 @@ public class AddVcfDosage {
 		parseCommandLine(args);
 		prepareReadVcf();
 		prepareWriteVcf();
-        processVariants();
+		processVariants();
 		cleanUp();
 	}
 

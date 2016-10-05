@@ -54,8 +54,7 @@ public class AddVcfDosage {
 	}
 
 	private void writeVariant(VariantContext variant, List<Genotype> gts) {
-		VariantContextBuilder variantBuilder = new VariantContextBuilder(
-				variant);
+		VariantContextBuilder variantBuilder = new VariantContextBuilder(variant);
 		variantBuilder.genotypes(gts);
 		VariantContext variant2 = variantBuilder.make();
 		writer.add(variant2);
@@ -71,22 +70,18 @@ public class AddVcfDosage {
 		return gts;
 	}
 
-	private void processGenotype(VariantContext variant, int sampleIdx,
-			Genotype genotype, List<Genotype> gts) {
+	private void processGenotype(VariantContext variant, int sampleIdx, Genotype genotype, List<Genotype> gts) {
 		double[] probd = readProbabilities(variant, sampleIdx, genotype);
 		double dosage = probd[1] + 2 * probd[2];
-		gts.add(new GenotypeBuilder(genotype).attribute("DS",
-				outFormat.format(dosage)).make());
+		gts.add(new GenotypeBuilder(genotype).attribute(dosageField, outFormat.format(dosage)).make());
 	}
 
-	private double[] readProbabilities(VariantContext variant, int sampleIdx,
-			Genotype g) {
-		String gp = (String) g.getAnyAttribute("GP");
+	private double[] readProbabilities(VariantContext variant, int sampleIdx, Genotype g) {
+		String gp = (String) g.getAnyAttribute(probabilitiesField);
 
 		String[] probs = gp.split(",");
 		if (probs.length != 3) {
-			log.error("Illegal probabilities string for variant: "
-					+ variant.getID() + "; sample: " + sampleIdx);
+			log.error("Illegal probabilities string for variant: " + variant.getID() + "; sample: " + sampleIdx);
 			System.exit(97);
 		}
 
@@ -96,17 +91,15 @@ public class AddVcfDosage {
 			probd[1] = Double.parseDouble(probs[1]);
 			probd[2] = Double.parseDouble(probs[2]);
 		} catch (NumberFormatException nfe) {
-			log.error("Not a number for genotype probability. Variant: "
-					+ variant.getID() + "; sample: " + sampleIdx);
+			log.error("Not a number for genotype probability. Variant: " + variant.getID() + "; sample: " + sampleIdx);
 			System.exit(96);
 		}
 
 		double sum = probd[0] + probd[1] + probd[2];
 		if (Math.abs(sum - 1d) > 0.0021) {
 			// 3 significant digits, and give some tolerance for rounding
-			log.error("Probabilities must sum up to 1 for variant: "
-					+ variant.getID() + "; sample: " + sampleIdx + "; sum = "
-					+ sum);
+			log.error("Probabilities must sum up to 1 for variant: " + variant.getID() + "; sample: " + sampleIdx
+					+ "; sum = " + sum);
 			System.exit(96);
 		}
 
@@ -114,13 +107,11 @@ public class AddVcfDosage {
 	}
 
 	private void prepareWriteVcf() {
-		// add header line for new "DS" field
-		header.addMetaDataLine(new VCFFormatHeaderLine("DS", 1,
-				VCFHeaderLineType.Float, "Genotype dosage"));
+		// add header line for new dosage ("DS") field
+		header.addMetaDataLine(new VCFFormatHeaderLine(dosageField, 1, VCFHeaderLineType.Float, "Genotype dosage"));
 
 		// don't index as this needs dictionary
-		VariantContextWriterBuilder builder = new VariantContextWriterBuilder()
-				.unsetOption(Options.INDEX_ON_THE_FLY);
+		VariantContextWriterBuilder builder = new VariantContextWriterBuilder().unsetOption(Options.INDEX_ON_THE_FLY);
 		writer = builder.setOutputFile(outputFile).build();
 
 		writer.writeHeader(header);
@@ -128,13 +119,11 @@ public class AddVcfDosage {
 
 	private void prepareReadVcf() {
 		AbstractFeatureReader<VariantContext, LineIterator> reader = AbstractFeatureReader
-				.getFeatureReader(inputFile.getAbsolutePath(), new VCFCodec(),
-						false);
+				.getFeatureReader(inputFile.getAbsolutePath(), new VCFCodec(), false);
 
 		header = (VCFHeader) reader.getHeader();
-		if (!header.hasFormatLine("GP")) {
-			System.err
-					.println("File does not seem to have genotype probabilities.");
+		if (!header.hasFormatLine(probabilitiesField)) {
+			System.err.println("File does not seem to have genotype probabilities.");
 			System.exit(98);
 		}
 
@@ -142,8 +131,10 @@ public class AddVcfDosage {
 	}
 
 	private void parseCommandLine(String[] args) {
-		if (args.length != 2) {
-			log.error("Usage: AddVcfDosage <invcf> <outvcf> [<GP_field_name>]");
+		if (args.length < 2 || args.length > 4) {
+			log.error("Usage: AddVcfDosage <invcf> <outvcf> [<GP_field_name>] [<DS_field_name>]");
+			log.error("Input VCF and output VCF may be in plain or GZIP format.");
+			log.error("GP field name defaults to 'GP', DS field name to 'DS'.");
 			System.exit(99);
 		}
 
@@ -158,6 +149,15 @@ public class AddVcfDosage {
 			log.error("Output file exists: " + args[1]);
 			System.exit(99);
 		}
+
+		if (args.length > 2)
+			probabilitiesField = args[2];
+
+		if (args.length > 3)
+			dosageField = args[3];
+
+		log.info("Using probabilities field: ", probabilitiesField);
+		log.info("Using dosage field: ", dosageField);
 	}
 
 	private File inputFile;
@@ -167,8 +167,10 @@ public class AddVcfDosage {
 	private VCFHeader header;
 	private VariantContextWriter writer;
 
-	private NumberFormat outFormat = new DecimalFormat("0.###",
-			DecimalFormatSymbols.getInstance(Locale.US));
+	private String probabilitiesField = "GP";
+	private String dosageField = "DS";
+
+	private NumberFormat outFormat = new DecimalFormat("0.###", DecimalFormatSymbols.getInstance(Locale.US));
 	private Log log = Log.getInstance(AddVcfDosage.class);
 
 	private ProgressLogger progressLogger;

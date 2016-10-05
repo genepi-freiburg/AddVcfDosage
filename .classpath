@@ -6,6 +6,6 @@
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/GenomeAnalysisTK.jar" sourcepath="misc/samtools-htsjdk-88b6719/src"/>
+	<classpathentry kind="lib" path="lib/htsjdk-2.5.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

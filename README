@@ -1,6 +1,6 @@
 USAGE
 
-/usr/lib/java/jdk1.8.0_101/bin/java -cp lib/GenomeAnalysisTK.jar:AddVcfDosage.jar <infile.vcf.gz> <outfile.vcf.gz>
+/usr/lib/java/jdk1.8.0_101/bin/java -cp lib/htsjdk-2.5.0.jar -jar lib/AddVcfDosage.jar <infile.vcf.gz> <outfile.vcf.gz> [<GP_field>] [<DS_field>}
 
 
 EXAMPLE

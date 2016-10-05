@@ -2,6 +2,9 @@ USAGE
 
 /usr/lib/java/jdk1.8.0_101/bin/java -cp lib/htsjdk-2.5.0.jar -jar lib/AddVcfDosage.jar <infile.vcf.gz> <outfile.vcf.gz> [<GP_field>] [<DS_field>}
 
+A simple shell script that sets up the classpath and invokes the JAR is provided.
+Please adjust to use your paths.
+
 
 EXAMPLE
 

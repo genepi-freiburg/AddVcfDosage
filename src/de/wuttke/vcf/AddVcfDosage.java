@@ -118,8 +118,7 @@ public class AddVcfDosage {
 	}
 
 	private void prepareReadVcf() {
-		AbstractFeatureReader<VariantContext, LineIterator> reader = AbstractFeatureReader
-				.getFeatureReader(inputFile.getAbsolutePath(), new VCFCodec(), false);
+		reader = AbstractFeatureReader.getFeatureReader(inputFile.getAbsolutePath(), new VCFCodec(), false);
 
 		header = (VCFHeader) reader.getHeader();
 		if (!header.hasFormatLine(probabilitiesField)) {

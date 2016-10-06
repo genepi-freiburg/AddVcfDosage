@@ -78,7 +78,11 @@ public class AddVcfDosage {
 
 	private double[] readProbabilities(VariantContext variant, int sampleIdx, Genotype g) {
 		String gp = (String) g.getAnyAttribute(probabilitiesField);
-
+		if (gp == null) {
+			log.warn("No probabilities field for variant: ", variant.getID() + "; sample: " + sampleIdx);
+			System.exit(97);
+		}
+		
 		String[] probs = gp.split(",");
 		if (probs.length != 3) {
 			log.error("Illegal probabilities string for variant: " + variant.getID() + "; sample: " + sampleIdx);
@@ -122,8 +126,7 @@ public class AddVcfDosage {
 
 		header = (VCFHeader) reader.getHeader();
 		if (!header.hasFormatLine(probabilitiesField)) {
-			System.err.println("File does not seem to have genotype probabilities.");
-			System.exit(98);
+			log.warn("File header does not mention genotype probabilities field: ", probabilitiesField);
 		}
 
 		progressLogger = new ProgressLogger(log, 10000);

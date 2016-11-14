@@ -1,5 +1,15 @@
 package de.wuttke.vcf;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
 import htsjdk.samtools.util.Log;
 import htsjdk.samtools.util.ProgressLogger;
 import htsjdk.tribble.AbstractFeatureReader;
@@ -15,15 +25,6 @@ import htsjdk.variant.vcf.VCFCodec;
 import htsjdk.variant.vcf.VCFFormatHeaderLine;
 import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFHeaderLineType;
-
-import java.io.File;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
 
 public class AddVcfDosage {
 
@@ -46,10 +47,16 @@ public class AddVcfDosage {
 	}
 
 	private void processVariants() throws IOException {
-		for (VariantContext variant : reader.iterator()) {
-			progressLogger.record(variant.getContig(), variant.getStart());
-			List<Genotype> gts = processVariantSamples(variant);
-			writeVariant(variant, gts);
+		Iterator<VariantContext> i = reader.iterator();
+		while (i.hasNext()) {
+			try {
+				VariantContext variant = i.next();
+				progressLogger.record(variant.getContig(), variant.getStart());
+				List<Genotype> gts = processVariantSamples(variant);
+				writeVariant(variant, gts);
+			} catch (Exception e) {
+				log.warn("Skipping variant because of exception: " + e.getMessage());
+			}
 		}
 	}
 

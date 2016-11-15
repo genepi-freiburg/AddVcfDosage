@@ -13,6 +13,7 @@ import java.util.Locale;
 import htsjdk.samtools.util.Log;
 import htsjdk.samtools.util.ProgressLogger;
 import htsjdk.tribble.AbstractFeatureReader;
+import htsjdk.tribble.TribbleException;
 import htsjdk.tribble.readers.LineIterator;
 import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.GenotypeBuilder;
@@ -54,8 +55,9 @@ public class AddVcfDosage {
 				progressLogger.record(variant.getContig(), variant.getStart());
 				List<Genotype> gts = processVariantSamples(variant);
 				writeVariant(variant, gts);
-			} catch (Exception e) {
+			} catch (TribbleException e) {
 				log.warn("Skipping variant. " + e.getMessage());
+				i.next();
 			}
 		}
 	}

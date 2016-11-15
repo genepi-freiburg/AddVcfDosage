@@ -55,7 +55,7 @@ public class AddVcfDosage {
 				List<Genotype> gts = processVariantSamples(variant);
 				writeVariant(variant, gts);
 			} catch (Exception e) {
-				log.warn("Skipping variant because of exception: " + e.getMessage());
+				log.warn("Skipping variant. " + e.getMessage());
 			}
 		}
 	}

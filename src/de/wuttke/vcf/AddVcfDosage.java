@@ -49,17 +49,25 @@ public class AddVcfDosage {
 
 	private void processVariants() throws IOException {
 		Iterator<VariantContext> i = reader.iterator();
-		while (i.hasNext()) {
+		boolean skipOne = false;
+		while (i.hasNext() || skipOne) {
 			try {
+				skipOne = false;
 				VariantContext variant = i.next();
-				progressLogger.record(variant.getContig(), variant.getStart());
-				List<Genotype> gts = processVariantSamples(variant);
-				writeVariant(variant, gts);
+				if (variant != null)
+					processVariant(variant);
 			} catch (TribbleException e) {
+				// unable to loop because i.hasNext() will return false once for the faulty variant
+				skipOne = true;
 				log.warn("Skipping variant. " + e.getMessage());
-				i.next();
 			}
 		}
+	}
+
+	private void processVariant(VariantContext variant) {
+		progressLogger.record(variant.getContig(), variant.getStart());
+		List<Genotype> gts = processVariantSamples(variant);
+		writeVariant(variant, gts);
 	}
 
 	private void writeVariant(VariantContext variant, List<Genotype> gts) {
